@@ -1,0 +1,43 @@
+name = "DecisionSystems"
+uuid = "f463edaf-fd9f-4ff8-91f2-51abac3c7f75"
+version = "0.1.0"
+authors = [
+  "Venkateshprasad <32921645+ven-k@users.noreply.github.com>"
+]
+
+[deps]
+OrdinaryDiffEq = "1dea7af3-3e70-54e6-95c3-0bf5283fa5ed"
+POMDPTools = "7588e00f-9cae-40de-98dc-e0c70c48cdd7"
+POMDPs = "a93abf59-7444-517b-a68a-c42f96afdd7d"
+Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
+SciMLBase = "0bca4576-84f4-4d90-8ffe-ffa030f20462"
+
+[weakdeps]
+ModelingToolkit = "961ee093-0014-501f-94e3-6117800e7a78"
+
+[extensions]
+DecisionSystemsModelingToolkitExt = "ModelingToolkit"
+
+[compat]
+MCTS = "0.5.7"
+ModelingToolkit = "10, 11"
+OrdinaryDiffEq = "6.108.0, 7"
+POMDPTools = "1.1.0"
+POMDPs = "1.0.0"
+SciMLBase = "2.143.0, 3"
+
+[extras]
+MCTS = "e12ccd36-dcad-5f33-8774-9175229e7b33"
+ModelingToolkit = "961ee093-0014-501f-94e3-6117800e7a78"
+Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = [
+  "ModelingToolkit",
+  "Random",
+  "Test"
+]
+
+[dyad]
+kernel = "3.3.0"
