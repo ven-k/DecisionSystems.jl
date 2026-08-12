@@ -108,6 +108,11 @@ your observation distribution has no `pdf`.
 ## Status
 
 Pre-registration. Core bridge, validated constructors, action helpers,
-continuous action spaces, RL env compatibility, and the integrator pool are
-implemented and tested (100 tests). ModelingToolkit integration (symbolic
-sensors, events, and parameters) is designed but not yet shipped.
+continuous action spaces, RL env compatibility, the integrator pool,
+thread-parallel evaluation (`propagate`, `parallel_rollouts`), and the
+ModelingToolkit extension — symbolic state/parameter access compiled at
+construction, observed-variable sensors, events firing inside decision
+intervals — are implemented and tested (107 tests, passing on both the
+SciMLBase 2 and SciMLBase 3 stacks with MTK 11). Known gap: the integrator
+pool does not yet support MTK models (`MTKParameters` restore); construct
+MTK-backed problems without `pool` for now.
