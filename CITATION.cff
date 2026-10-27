@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+type: software
+title: "DecisionSystems.jl"
+abstract: >-
+  Wraps a SciML ODEProblem or a ModelingToolkit System as a POMDPs.jl MDP or
+  POMDP, so sampling-based planners run directly against the physics model,
+  with the ODE solver executing inside every decision interval.
+version: 0.1.0
+authors:
+  - given-names: Venkateshprasad
+    alias: ven-k
+    email: 32921645+ven-k@users.noreply.github.com
+repository-code: "https://github.com/ven-k/DecisionSystems.jl"
+url: "https://ven-k.github.io/DecisionSystems.jl/stable/"
+license: MIT
+keywords:
+  - Julia
+  - POMDP
+  - planning under uncertainty
+  - ModelingToolkit
+  - SciML
+  - differential equations
