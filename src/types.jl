@@ -1,4 +1,4 @@
-@kwdef struct PhysicsModel{P,A,T,C,SI,R,O,TR,U,K<:NamedTuple}
+@kwdef struct PhysicsModel{P,A,T,C,SI,R,O,TR,U,K<:NamedTuple,AS}
   prob::P
   alg::A
   dt_decision::T
@@ -9,6 +9,7 @@
   terminal_fn::TR = _default_terminal
   state_to_u0::U = _state_to_u0
   integrator_kwargs::K = (;)
+  apply_state!::AS = _default_apply_state
 end
 
 struct DecisionMDP{S,PM<:PhysicsModel,A,AS,G,I,PL} <: MDP{S,A}

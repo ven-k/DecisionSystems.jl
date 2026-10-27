@@ -1,4 +1,4 @@
-# Phase 1a: action helpers and the post-action dt reset.
+# Action helpers and the post-action dt reset.
 
 @testset "Action helpers reproduce raw-closure behavior" begin
   # set_param!: golden decay — helper writes the rate like the raw closure did

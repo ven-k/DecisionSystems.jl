@@ -14,7 +14,10 @@ _restore_params!(integ, p0) =
 Pre-build `size` integrators for `model` so transitions reuse them via
 `reinit!` instead of paying `init` each call. Pass the pool to `DecisionMDP`/
 `DecisionPOMDP` via the `pool` keyword. Safe under parallel tree search: each
-transition holds a checked-out integrator exclusively.
+transition holds a checked-out integrator exclusively. Before every
+transition the integrator's parameter object is restored in full from
+`model.prob.p` (plain vectors and MTK's `MTKParameters` alike), so parameter
+writes by `apply_action!` or by events never leak into the next checkout.
 """
 function IntegratorPool(model::PhysicsModel; size::Int=Threads.nthreads())
   size >= 1 || throw(ArgumentError("pool size must be >= 1, got $size"))
@@ -31,11 +34,13 @@ function IntegratorPool(model::PhysicsModel; size::Int=Threads.nthreads())
 end
 
 function _transition_on!(integ, model::PhysicsModel, s, a)
-  (; state_from_integrator, state_to_u0, prob, apply_action!, integrator_kwargs, dt_decision) = model
+  (; state_from_integrator, state_to_u0, prob, apply_state!, apply_action!,
+     integrator_kwargs, dt_decision) = model
   u0 = state_to_u0(s)
   t0 = _get_t0(s)
   _restore_params!(integ, prob.p)
   reinit!(integ, u0; t0=t0, tf=t0 + dt_decision, erase_sol=true, reset_dt=true)
+  apply_state!(integ, s)
   apply_action!(integ, a)
   u_modified!(integ, true)
   haskey(integrator_kwargs, :dt) || auto_dt_reset!(integ)

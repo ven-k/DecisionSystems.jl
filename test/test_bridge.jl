@@ -1,5 +1,4 @@
 # _simulate_step correctness: golden trajectories, tree-search safety, time handling.
-# Layers 1-2 of rnd/12_validation.md.
 
 @testset "Golden trajectory: closed-form decay" begin
   pm = PhysicsModel(prob=DECAY_PROB, alg=Tsit5(), dt_decision=1.0,

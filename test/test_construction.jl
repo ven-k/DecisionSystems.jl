@@ -1,5 +1,4 @@
 # Construction-time behavior: kwdef defaults, validation, probe, type inference.
-# Pins the July 2026 review findings (rnd/00_status.md): B5, N1-N5, G3.
 
 struct NotADist end  # has no rand method
 

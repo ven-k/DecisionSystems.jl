@@ -1,4 +1,4 @@
-# 1d (rnd/14 F6c): flat constructor — PhysicsModel keywords passed directly
+# Flat constructor — PhysicsModel keywords passed directly
 # to the wrapper. Same vocabulary as the two-tier form.
 
 @testset "Flat DecisionMDP equals two-tier" begin

@@ -1,9 +1,9 @@
-# Phase 4 (rnd/08): IntegratorPool gates.
+# IntegratorPool gates.
 #   Gate 1: pooled path produces IDENTICAL trajectories to the init path.
 #   Gate 2: parallel tree-search-style access does not corrupt state.
 #   Gate 3: parameter mutations by actions do not leak between checkouts.
 # (Perf assertions live outside Pkg.test — CI timing is too flaky; the
-#  speedup benchmark is examples/crack_inspection + rnd/08 budgets.)
+#  speedup benchmark lives with the examples.)
 
 @testset "Gate 1: pooled == unpooled trajectories" begin
   plain = tank_mdp()

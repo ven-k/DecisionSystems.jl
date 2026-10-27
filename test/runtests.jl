@@ -38,4 +38,8 @@ tank_mdp(; kwargs...) = DecisionMDP(;
   include("test_rl_env.jl")
   include("test_pool.jl")
   include("test_parallel.jl")
+  include("test_mtk_ext.jl")
+  isfile(joinpath(@__DIR__, "test_hidden_unknowns.jl")) && include("test_hidden_unknowns.jl")
+  include("test_apply_state.jl")
+  include("test_hidden_api.jl")
 end
