@@ -1,0 +1,63 @@
+name: CI
+on:
+  push:
+    branches:
+      - main
+    tags: ['*']
+  pull_request:
+  workflow_dispatch:
+concurrency:
+  # Skip intermediate builds: always. Cancel intermediate builds: only for pull requests.
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
+jobs:
+  test:
+    name: Julia ${{ matrix.julia-version }} - ${{ matrix.stack }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    permissions: # needed to allow julia-actions/cache to proactively delete old caches that it has created
+      actions: write
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        julia-version:
+          - 'lts'   # Julia 1.10.x: the floor declared in [compat]
+          - '1'     # newest stable 1.x (1.13.x at the time of writing); tracks new releases automatically
+        stack:
+          - scimlbase-3   # plain registry resolve: SciMLBase 3 + OrdinaryDiffEq 7 + ModelingToolkit >= 11.27
+          - scimlbase-2   # compat-forced:          SciMLBase 2 + OrdinaryDiffEq 6 + ModelingToolkit <= 11.26
+    steps:
+      - uses: actions/checkout@v4
+      - uses: julia-actions/setup-julia@v2
+        with:
+          version: ${{ matrix.julia-version }}
+      - uses: julia-actions/cache@v2
+      # Why both cells resolve from the registry instead of the tracked Manifest.toml:
+      # the tracked Manifest is a development snapshot (resolved on Julia 1.12). It does
+      # not instantiate cleanly on LTS 1.10, and it would pin the "plain" cell to whatever
+      # stack it happens to hold. A fresh resolve under [compat] is also exactly what a
+      # registered package promises its users.
+      - name: Drop the tracked Manifest
+        run: rm -f Manifest.toml
+      # Why a compat bound rather than Pkg.add(version=...) or Pkg.pin: Pkg.test builds its
+      # sandbox by resolving the test target (ModelingToolkit) against the package Manifest
+      # and, if that fails, re-resolves from scratch. A narrowed [compat] entry is honoured
+      # by every one of those resolves; an added or pinned version is not. OrdinaryDiffEq 6
+      # and ModelingToolkit <= 11.26 then follow from their own compat on SciMLBase.
+      # The edit lives only in this throwaway checkout.
+      - name: Force the SciMLBase 2 stack
+        if: matrix.stack == 'scimlbase-2'
+        shell: julia --color=yes --project=. {0}
+        run: |
+          using Pkg
+          Pkg.compat("SciMLBase", "2")
+      - uses: julia-actions/julia-buildpkg@v1
+      - name: Show the resolved package stack
+        shell: julia --color=yes --project=. {0}
+        run: |
+          using Pkg
+          Pkg.status()
+      - uses: julia-actions/julia-runtest@v1
+        with:
+          coverage: false   # no coverage upload is configured yet; turn on together with codecov
