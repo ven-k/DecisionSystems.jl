@@ -1,4 +1,4 @@
-# Phase 1b (rnd/14 F5, Q7): actions beyond Vector — continuous spaces work,
+# Actions beyond Vector — continuous spaces work,
 # collections stay the common case, and failures are loud at construction.
 
 # Minimal continuous action space: supports rand only — the exact contract

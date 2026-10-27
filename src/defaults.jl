@@ -13,3 +13,5 @@ _get_t0(s::NamedTuple) = get(s, :t, 0.0)
 _get_t0(s) = 0.0
 
 _default_terminal(s) = false
+
+_default_apply_state(integ, s) = nothing

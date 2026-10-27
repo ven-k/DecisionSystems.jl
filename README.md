@@ -1,10 +1,27 @@
 # DecisionSystems.jl
 
+[![CI](https://github.com/ven-k/DecisionSystems.jl/actions/workflows/CI.yml/badge.svg)](https://github.com/ven-k/DecisionSystems.jl/actions/workflows/CI.yml)
+[![Docs: stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://ven-k.github.io/DecisionSystems.jl/stable/)
+[![Docs: dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://ven-k.github.io/DecisionSystems.jl/dev/)
+
 Turn a SciML simulator into a decision problem. `DecisionSystems.jl` wraps an
 `ODEProblem` as a POMDPs.jl `MDP` or `POMDP`, so the POMDPs.jl solver
 ecosystem — MCTS, MCTS-DPW, POMCPOW, particle filters, RL bridges — plans
 directly against your physics, with the ODE solver (adaptive stepping,
 events/callbacks) doing the work inside every decision interval.
+
+## Installation
+
+Julia 1.10 or newer. Until the package is registered in the General registry:
+
+```julia
+pkg> add https://github.com/ven-k/DecisionSystems.jl
+```
+
+After registration: `pkg> add DecisionSystems`. Documentation:
+[stable](https://ven-k.github.io/DecisionSystems.jl/stable/) ·
+[dev](https://ven-k.github.io/DecisionSystems.jl/dev/). Worked examples live in
+[`examples/`](examples/).
 
 ```julia
 using DecisionSystems, OrdinaryDiffEq, POMDPs, POMDPTools
@@ -23,7 +40,7 @@ mdp = DecisionMDP(
 )
 
 using MCTS
-policy = solve(DPWSolver(n_iterations=500, depth=20), mdp)
+policy = POMDPs.solve(DPWSolver(n_iterations=500, depth=20), mdp)   # qualified: OrdinaryDiffEq exports a `solve` too
 ```
 
 Add a sensor model and it is a POMDP:
@@ -50,15 +67,20 @@ pomdp = DecisionPOMDP(; ...,                       # same physics keywords
   `rand(rng, actions)` — pre-grid nothing; MCTS-DPW's progressive widening
   works natively. Collections remain the common case.
 - **Hidden states and events.** Carry unknown physical parameters in the
-  state (`du = 0` components) for belief-space planning; put safety limits in
-  a `ContinuousCallback` with `terminate!` so violations inside a decision
-  interval end the step at the crossing.
+  state (`du = 0` components) for belief-space planning, or, with
+  ModelingToolkit, `hidden = [sys.k]` to carry a parameter per particle
+  through the `apply_state!` hook with no `der = 0` equation; put safety
+  limits in a `ContinuousCallback` with `terminate!` so violations inside a
+  decision interval end the step at the crossing.
 - **RL bridge.** POMDPTools' `MDPCommonRLEnv`/`POMDPCommonRLEnv` work
   unmodified (`initialobs` included).
 - **`IntegratorPool`.** `pool=n` reuses integrators via `reinit!` — measured
-  2.9× per transition on init-dominated models, bitwise-identical
-  trajectories, safe under threaded search. (When the block's integration
-  itself dominates, the pool does not help — measure yours.)
+  2.9× per transition on init-dominated models and 2.6× on the MTK-compiled
+  warehouse block (28 → 11 µs, 14 kB → 1 kB per transition; the
+  `MTKParameters` object is restored from the prototype on every checkout),
+  bitwise-identical trajectories, safe under threaded search. (When the
+  block's integration itself dominates, the pool does not help — measure
+  yours.)
 
 A complete worked example — hidden fatigue-crack growth, costly inspection,
 belief-space planning beating tuned inspection schedules — lives in
@@ -112,7 +134,8 @@ continuous action spaces, RL env compatibility, the integrator pool,
 thread-parallel evaluation (`propagate`, `parallel_rollouts`), and the
 ModelingToolkit extension — symbolic state/parameter access compiled at
 construction, observed-variable sensors, events firing inside decision
-intervals — are implemented and tested (107 tests, passing on both the
-SciMLBase 2 and SciMLBase 3 stacks with MTK 11). Known gap: the integrator
-pool does not yet support MTK models (`MTKParameters` restore); construct
-MTK-backed problems without `pool` for now.
+intervals — are implemented and tested (250 tests, passing on both the
+SciMLBase 2 and SciMLBase 3 stacks with MTK 11). The integrator pool
+supports MTK models: the `MTKParameters` object is restored from the
+prototype before every checkout (2.6× per transition on the warehouse
+physics).

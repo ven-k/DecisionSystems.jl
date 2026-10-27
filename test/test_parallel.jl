@@ -1,4 +1,4 @@
-# Phase 4b gates: threaded batch APIs on top of the pool.
+# Threaded batch APIs on top of the pool.
 #   Gate 1: propagate == per-state transition, pool and init paths.
 #   Gate 2: parallel_rollouts is deterministic in the caller rng and matches
 #           a serial recomputation with the same child streams.
